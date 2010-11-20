@@ -314,13 +314,21 @@
     // But this even doesn't work with Flash Lite (e.g. in Droid Incredible). So with Flash
     // Lite, we put it at (0, 0). This shows 1x1 box visible at left-top corner but this is
     // the best we can do as far as we know now.
+    // Flash timers + JS callbacks *might* be more responsive in non-IE browsers if SWF is
+    // always on-screen, and at least 6x6px (8x8px to start for Firefox/win in some cases?)
+    // wmode:transparent will effectively hide the flash movie from view.
+    var swfWidth = 1;
+    var swfHeight = 1;
     container.style.position = "absolute";
     if (WebSocket.__isFlashLite()) {
       container.style.left = "0px";
       container.style.top = "0px";
     } else {
-      container.style.left = "-100px";
-      container.style.top = "-100px";
+      container.style.position = "fixed";
+      container.style.bottom = "0px";
+      container.style.left = "0px";
+      swfWidth = 8;
+      swfHeight = 8;
     }
     var holder = document.createElement("div");
     holder.id = "webSocketFlash";
@@ -330,7 +338,7 @@
     // http://help.adobe.com/en_US/as3/mobile/WS4bebcd66a74275c36cfb8137124318eebc6-7ffd.html
     swfobject.embedSWF(
       WEB_SOCKET_SWF_LOCATION, "webSocketFlash",
-      "1" /* width */, "1" /* height */, "9.0.0" /* SWF version */,
+      swfWidth, swfHeight, "9.0.0" /* SWF version */,
       null, {bridgeName: "webSocket"}, {hasPriority: true, allowScriptAccess: "always"}, null,
       function(e) {
         if (!e.success) console.error("[WebSocket] swfobject.embedSWF failed");
